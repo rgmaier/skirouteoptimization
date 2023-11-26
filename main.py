@@ -5,6 +5,7 @@ import itertools
 import networkx as nx
 import pandas as pd
 import matplotlib.pyplot as plt
+import datetime
 
 
 def get_imbalanced_nodes(graph):
@@ -116,12 +117,9 @@ def create_eulerian_circuit(graph_augmented, graph_original, starting_node=None)
 
     return euler_circuit
 
-
-# For some reason adding the last edge stj_harsch_mid,stj_ob_conn_lower,5a,3,blue,Slope to the edge list yields a non-Eulerian graph -> ToDo
-
+#Need to make this dynamic - currently only works for St. Johann / Oberndorf
 edgelist = pd.read_csv("edgelist_stjohann_tirol.csv")
 nodelist = pd.read_csv("nodelist_stjohann_tirol.csv")
-
 start_node = "ob_bauernalm_tal"
 
 print(edgelist)
@@ -212,14 +210,16 @@ if len(get_imbalanced_nodes(g_aug)) != 0:
 
 euler_circuit = create_eulerian_circuit(g_aug, g, start_node)
 
-stepCounter = 1
-for edge in euler_circuit:
+for step, edge in enumerate(euler_circuit, start=1):
     print(
-        f"Step {stepCounter}: Start at {edge[0]}, go to {edge[1]} using {edge[2]['type_en']} {edge[2]['trail']}"
+        f"Step {step}: Start at {edge[0]}, go to {edge[1]} using {edge[2]['type_en']} {edge[2]['trail']}"
     )
-    stepCounter += 1
 
-total_time = sum([edge[2]["distance"] for edge in euler_circuit])
+
+total_time = sum(edge[2]["distance"] for edge in euler_circuit)
+
+#Convert the value of total_time to a readable format which is hh:mm:ss. total_time is in seconds.
+total_time = str(datetime.timedelta(seconds=total_time))
 print(total_time)
 
 
